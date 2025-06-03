@@ -1,0 +1,19 @@
+{
+  "name": "codelab-realstate-rpa",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
+    "@google-cloud/pubsub": "^5.0.0",
+    "googleapis": "^105.0.0"
+  }
+}
