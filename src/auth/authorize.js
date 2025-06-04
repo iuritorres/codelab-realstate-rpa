@@ -6,6 +6,7 @@ import { saveCredentials } from "./saveCredentials.js";
 /**
  * Load or request or authorization to call APIs.
  *
+ * @return {Promise<OAuth2Client>}
  */
 export async function authorize() {
   let client = await loadSavedCredentialsIfExist();
