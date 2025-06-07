@@ -5,7 +5,10 @@
 import "dotenv/config";
 import { promises as fs } from "fs";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { RealStateCategory } from "./constants/notion.js";
+import { notion } from "./notion/client.js";
 
+// ############## Gmail API Code ##############
 // const client = await authorize();
 
 // export const gmail = google.gmail({
@@ -52,6 +55,7 @@ import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 //   Buffer.from(negotiationNotesPDF.data, "base64")
 // );
 
+// ############## PDF Processing Code ##############
 const negotiationNotes = await fs.readFile("negotiation_notes.pdf");
 const pdfBuffer = Buffer.from(negotiationNotes, "base64");
 const pdfUint8Array = new Uint8Array(pdfBuffer);
@@ -69,7 +73,40 @@ const amountLabel = data.items.find((item) =>
 );
 
 const amountLabelIndex = data.items.indexOf(amountLabel);
-const amountValue = data.items[amountLabelIndex - 1];
+const amountValue = data.items[amountLabelIndex - 1].str
+  .replace("R$", "")
+  .replace(".", "")
+  .replace(",", ".")
+  .trim();
 
-console.log(amountLabel);
-console.log(amountValue);
+// ############## Notion API Code ##############
+await notion.pages.create({
+  parent: {
+    database_id: process.env.NOTION_REALSTATE_DATABASE_ID,
+  },
+  properties: {
+    Source: {
+      title: [
+        {
+          text: {
+            content: "RPA",
+          },
+        },
+      ],
+    },
+    Category: {
+      select: {
+        name: RealStateCategory.Investment,
+      },
+    },
+    Amount: {
+      number: Number(amountValue),
+    },
+    Date: {
+      type: "date",
+      date: {
+        start: new Date().toISOString().slice(0, 10),
+      },
+    },
+  },
+});
