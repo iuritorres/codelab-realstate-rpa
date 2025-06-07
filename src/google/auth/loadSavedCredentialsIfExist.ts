@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";
-import { TOKEN_PATH } from "../constants/index";
+import { TOKEN_PATH } from "../constants/credentials";
 
 export async function loadSavedCredentialsIfExist(): Promise<OAuth2Client | null> {
   try {

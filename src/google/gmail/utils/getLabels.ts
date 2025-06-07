@@ -1,6 +1,10 @@
 import { gmail_v1 } from "googleapis";
 
-export async function getLabels({ gmail }: { gmail: gmail_v1.Gmail }) {
+interface GetLabelsParams {
+  gmail: gmail_v1.Gmail;
+}
+
+export async function getLabels({ gmail }: GetLabelsParams) {
   const response = await gmail.users.labels.list({
     userId: "me",
   });
@@ -9,7 +13,7 @@ export async function getLabels({ gmail }: { gmail: gmail_v1.Gmail }) {
 
   if (!labels || labels.length === 0) {
     console.log("No labels found.");
-    return;
+    return [];
   }
 
   return labels;

@@ -1,40 +1,28 @@
-import { google } from "googleapis";
-import { authorize } from "./auth/authorize";
-import { XPI_OPERATIONS_LABEL } from "./constants";
-import { getLabels } from "./gmail/getLabels";
-import { promises as fs } from "fs";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
-import { RealStateCategory } from "./constants/notion";
-import { notion } from "./notion/client";
 import { env } from "./env";
+import { NEGOTIATION_NOTES_LABEL } from "./google/constants/gmail";
+import { getGmailClient } from "./google/gmail/client";
+import { getLabels } from "./google/gmail/utils/getLabels";
+import { RealStateCategory } from "./notion/enums/notion";
+import { createInvestmentRecord } from "./notion/utils/createInvestmentRecord";
+import { getInvestmentAmountFromPDF } from "./utils/getInvestmentAmountFromPDF";
 
 (async () => {
-  // ############## Gmail API Code ##############
-  const client = await authorize();
-
-  const gmail = google.gmail({
-    version: "v1",
-    auth: client,
-  });
+  const gmail = await getGmailClient();
 
   const labels = await getLabels({ gmail });
 
-  if (!labels) {
-    throw new Error("No labels found in Gmail.");
-  }
-
-  const xpiOperationsLabel = labels.filter(
-    (label) => label.name === XPI_OPERATIONS_LABEL
+  const negotiationsLabel = labels.filter(
+    (label) => label.name === NEGOTIATION_NOTES_LABEL
   );
 
-  if (!xpiOperationsLabel[0]) {
+  if (!negotiationsLabel[0]) {
     throw new Error("XP Operations Label not found");
   }
 
   const mailId = await gmail.users.messages
     .list({
       userId: "me",
-      labelIds: [xpiOperationsLabel[0].id!],
+      labelIds: [negotiationsLabel[0].id!],
     })
     .then((response) => response.data.messages?.[0].id);
 
@@ -75,82 +63,20 @@ import { env } from "./env";
     throw new Error("Negotiation notes PDF data not found.");
   }
 
-  await fs.writeFile(
-    "negotiation_notes.pdf",
-    Buffer.from(negotiationNotesPDF.data, "base64")
-  );
+  const getPDFfromMail = "";
 
-  // ############## PDF Processing Code ##############
-  const negotiationNotes = await fs.readFile("negotiation_notes.pdf");
-  const pdfUint8Array = new Uint8Array(negotiationNotes);
+  // ----------------------------------------------------------------------
+  const negotiationNotes = Buffer.from(negotiationNotesPDF.data, "base64");
 
-  const document = await getDocument({
-    data: pdfUint8Array,
+  const investmentAmount = await getInvestmentAmountFromPDF({
+    pdfData: new Uint8Array(negotiationNotes),
     password: env.PDF_PASSWORD,
-  }).promise;
+  });
 
-  const page = await document.getPage(1);
-  const data = await page.getTextContent();
-
-  const amountLabel = data.items.find(
-    (item): item is import("pdfjs-dist/types/src/display/api").TextItem =>
-      "str" in item &&
-      typeof item.str === "string" &&
-      item.str.includes("Líquido para")
-  );
-
-  let amountValue: string | undefined = undefined;
-
-  if (amountLabel) {
-    const amountLabelIndex = data.items.indexOf(amountLabel);
-    const prevItem = data.items[amountLabelIndex - 1];
-
-    if ("str" in prevItem && typeof prevItem.str === "string") {
-      amountValue = prevItem.str
-        .replace("R$", "")
-        .replace(".", "")
-        .replace(",", ".")
-        .trim();
-    } else {
-      throw new Error(
-        "Previous item is not a TextItem or missing 'str' property."
-      );
-    }
-  } else {
-    throw new Error("Amount label not found in PDF text content.");
-  }
-
-  console.log("Amount Value:", amountValue);
-
-  // ############## Notion API Code ##############
-  await notion.pages.create({
-    parent: {
-      database_id: env.NOTION_REALSTATE_DATABASE_ID,
-    },
-    properties: {
-      Source: {
-        title: [
-          {
-            text: {
-              content: "RPA",
-            },
-          },
-        ],
-      },
-      Category: {
-        select: {
-          name: RealStateCategory.INVESTMENT,
-        },
-      },
-      Amount: {
-        number: Number(amountValue),
-      },
-      Date: {
-        type: "date",
-        date: {
-          start: new Date().toISOString().slice(0, 10),
-        },
-      },
-    },
+  await createInvestmentRecord({
+    source: "RPA",
+    category: RealStateCategory.INVESTMENT,
+    amount: investmentAmount,
+    date: new Date(),
   });
 })();

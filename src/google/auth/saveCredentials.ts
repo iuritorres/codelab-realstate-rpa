@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import { OAuth2Client } from "google-auth-library";
-import { CREDENTIALS_PATH, TOKEN_PATH } from "../constants/index.js";
+import { CREDENTIALS_PATH, TOKEN_PATH } from "../constants/credentials";
 
 export async function saveCredentials(client: OAuth2Client) {
   const content = await fs.readFile(CREDENTIALS_PATH);

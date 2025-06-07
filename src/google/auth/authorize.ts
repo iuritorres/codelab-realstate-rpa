@@ -1,5 +1,6 @@
 import { authenticate } from "@google-cloud/local-auth";
-import { CREDENTIALS_PATH, SCOPES } from "../constants";
+import { CREDENTIALS_PATH } from "../constants/credentials";
+import { SCOPES } from "../constants/scopes";
 import { loadSavedCredentialsIfExist } from "./loadSavedCredentialsIfExist";
 import { saveCredentials } from "./saveCredentials";
 
