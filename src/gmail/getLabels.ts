@@ -1,6 +1,6 @@
-import { gmail } from "../index.js";
+import { gmail_v1 } from "googleapis";
 
-export async function getLabels() {
+export async function getLabels({ gmail }: { gmail: gmail_v1.Gmail }) {
   const response = await gmail.users.labels.list({
     userId: "me",
   });

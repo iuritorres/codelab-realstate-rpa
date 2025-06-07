@@ -1,22 +1,36 @@
 {
   "name": "codelab-realstate-rpa",
+  "description": "A Real State RPA project using Google Cloud Pub/Sub and Notion API",
+  "author": {
+    "name": "CodeLab",
+    "email": "iuri.t1000@gmail.com",
+    "url": "https://github.com/iuritorres"
+  },
+  "license": "ISC",
+  "keywords": [
+    "google-cloud",
+    "notion",
+    "pubsub",
+    "realstate",
+    "rpa",
+    "automation"
+  ],
   "version": "1.0.0",
   "type": "module",
-  "main": "src/index.js",
   "scripts": {
-    "start": "node .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx src/index.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
     "@google-cloud/pubsub": "^5.0.0",
     "@notionhq/client": "^3.1.3",
     "dotenv": "^16.5.0",
     "googleapis": "^105.0.0",
-    "pdfjs-dist": "^5.3.31"
+    "pdfjs-dist": "^5.3.31",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

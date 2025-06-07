@@ -1,15 +1,11 @@
 import { promises as fs } from "fs";
+import { OAuth2Client } from "google-auth-library";
 import { CREDENTIALS_PATH, TOKEN_PATH } from "../constants/index.js";
 
-/**
- * Serializes credentials to a file compatible with GoogleAuth.fromJSON.
- *
- * @param {OAuth2Client} client
- * @return {Promise<void>}
- */
-export async function saveCredentials(client) {
+export async function saveCredentials(client: OAuth2Client) {
   const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
+
+  const keys = JSON.parse(content.toString());
   const key = keys.installed || keys.web;
 
   const payload = JSON.stringify({

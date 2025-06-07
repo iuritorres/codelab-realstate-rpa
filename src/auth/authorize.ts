@@ -1,13 +1,8 @@
 import { authenticate } from "@google-cloud/local-auth";
-import { CREDENTIALS_PATH, SCOPES } from "../constants/index.js";
-import { loadSavedCredentialsIfExist } from "./loadSavedCredentialsIfExist.js";
-import { saveCredentials } from "./saveCredentials.js";
+import { CREDENTIALS_PATH, SCOPES } from "../constants";
+import { loadSavedCredentialsIfExist } from "./loadSavedCredentialsIfExist";
+import { saveCredentials } from "./saveCredentials";
 
-/**
- * Load or request or authorization to call APIs.
- *
- * @return {Promise<OAuth2Client>}
- */
 export async function authorize() {
   let client = await loadSavedCredentialsIfExist();
 
