@@ -1,6 +1,5 @@
 import { PubSub } from "@google-cloud/pubsub";
 import { env } from "../../env";
-import { getSubscriptionPolicy } from "./getSubscriptionPolicy";
 import { setSubscriptionPolicy } from "./setSubscriptionPolicy";
 
 export async function setupPubSubTopicAndSubscription() {
@@ -10,31 +9,29 @@ export async function setupPubSubTopicAndSubscription() {
     .topic(env.GOOGLE_PUBSUB_TOPIC)
     .get({ autoCreate: true });
 
-  const [subscription] = await topic
-    .subscription(env.GOOGLE_PUBSUB_SUBSCRIPTION)
-    .get({ autoCreate: true });
+  const [subscriptions] = await topic.getSubscriptions();
 
-  const subscriptionPermissions = await getSubscriptionPolicy(pubsub);
-
-  const hasEditorRole = subscriptionPermissions.bindings?.some(
-    (binding) => binding.role === "roles/pubsub.editor"
-  );
-
-  if (!hasEditorRole) {
+  if (Boolean(subscriptions.length)) {
+    console.log("✅ Subscription already exists. No changes made.");
     await setSubscriptionPolicy(pubsub);
+
+    return;
   }
 
-  subscription.on("message", (message) => {
-    console.log("Received message:", message.data.toString());
-    process.exit(0);
+  await topic.createSubscription(env.GOOGLE_PUBSUB_SUBSCRIPTION, {
+    ackDeadlineSeconds: 60,
+    pushConfig: {
+      pushEndpoint: env.GOOGLE_PUBSUB_PUSH_ENDPOINT,
+    },
+    expirationPolicy: {
+      ttl: null,
+    },
   });
 
-  subscription.on("error", (error) => {
-    console.error("Received error:", error);
-    process.exit(1);
-  });
+  await setSubscriptionPolicy(pubsub);
 
-  topic.publishMessage({
-    data: Buffer.from("Test message!"),
-  });
+  console.log("✅ Successfully created Pub/Sub topic and subscription.");
+  console.log(
+    `🔗 Push endpoint is set to "${env.GOOGLE_PUBSUB_PUSH_ENDPOINT}".`
+  );
 }

@@ -18,8 +18,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/server.ts",
-    "watch-gmail": "tsx src/google/gmail/utils/watch.ts"
+    "start": "tsx src/server.ts"
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",

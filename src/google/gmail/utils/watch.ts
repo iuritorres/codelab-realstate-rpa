@@ -2,11 +2,11 @@ import { env } from "../../../env";
 import { getGmailClient } from "../client";
 import { getNegotiationsLabel } from "./getNegotiationsLabel";
 
-(async () => {
+export const subscribeToGmailPushNotifications = async () => {
   const gmail = await getGmailClient();
   const negotiationsLabel = await getNegotiationsLabel({ gmail });
 
-  const watchResponse = await gmail.users.watch({
+  await gmail.users.watch({
     userId: "me",
     requestBody: {
       topicName: `projects/${env.GOOGLE_PROJECT_ID}/topics/${env.GOOGLE_PUBSUB_TOPIC}`,
@@ -15,5 +15,15 @@ import { getNegotiationsLabel } from "./getNegotiationsLabel";
     },
   });
 
-  console.log("Watch started:", watchResponse.data);
-})();
+  console.log("📬 Subscribed to Gmail push notifications.");
+};
+
+export const unsubscribeFromGmailPushNotifications = async () => {
+  const gmail = await getGmailClient();
+
+  await gmail.users.stop({
+    userId: "me",
+  });
+
+  console.log("📭 Unsubscribed from Gmail push notifications.");
+};
