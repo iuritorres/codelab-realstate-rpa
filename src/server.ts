@@ -1,8 +1,5 @@
 import express from "express";
-import {
-  subscribeToGmailPushNotifications,
-  unsubscribeFromGmailPushNotifications,
-} from "./google/gmail/utils/watch";
+import { subscribeToGmailPushNotifications } from "./google/gmail/utils/watch";
 import { setupPubSubTopicAndSubscription } from "./google/pubsub/setupPubSubTopicAndSubscription";
 import { webhookRouter } from "./routes";
 
@@ -12,27 +9,11 @@ server.use(express.json());
 
 server.use("/webhook", webhookRouter);
 
-const PORT = 3000;
-server.listen(PORT, async () => {
+const port = process.env.PORT || 3000;
+
+server.listen(port, async () => {
   await setupPubSubTopicAndSubscription();
   await subscribeToGmailPushNotifications();
 
-  console.log(`Server running on port ${PORT}.`);
+  console.log(`Server running on port ${port}.`);
 });
-
-const shutdown = async () => {
-  console.log(
-    "⏹️  Shutting down server, unsubscribing from Gmail push notifications..."
-  );
-
-  try {
-    await unsubscribeFromGmailPushNotifications();
-  } catch (error) {
-    console.error("Error unsubscribing from Gmail push notifications:", error);
-  }
-
-  process.exit(0);
-};
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);

@@ -18,7 +18,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/server.ts"
+    "start": "tsx src/server.ts",
+    "gmail:unsubscribe": "tsx src/scripts/unsubscribe-gmail.ts"
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
