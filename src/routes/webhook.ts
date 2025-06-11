@@ -35,7 +35,7 @@ webhookRouter.post("/gmail", async (request, response) => {
   const historyResponse = await gmail.users.history.list({
     userId: "me",
     startHistoryId: historyId,
-    labelId: TEST_LABEL_ID,
+    labelId: negotiationsLabel.id!,
     historyTypes: ["messageAdded"],
   });
 
@@ -56,7 +56,7 @@ webhookRouter.post("/gmail", async (request, response) => {
       const subject =
         headers.find((key) => key.name === "Subject")?.value || "(sem título)";
 
-      if (!labels.includes(TEST_LABEL_ID!)) {
+      if (!labels.includes(negotiationsLabel.id!)) {
         continue;
       }
 

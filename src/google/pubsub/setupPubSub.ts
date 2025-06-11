@@ -1,8 +1,7 @@
 import { PubSub } from "@google-cloud/pubsub";
 import { env } from "../../env";
-import { setSubscriptionPolicy } from "./setSubscriptionPolicy";
 
-export async function setupPubSubTopicAndSubscription() {
+export async function setupPubSub() {
   const pubsub = new PubSub({ projectId: env.GOOGLE_PROJECT_ID });
 
   const [topic] = await pubsub
@@ -11,10 +10,8 @@ export async function setupPubSubTopicAndSubscription() {
 
   const [subscriptions] = await topic.getSubscriptions();
 
-  if (Boolean(subscriptions.length)) {
+  if (!!subscriptions.length) {
     console.log("✅ Subscription already exists. No changes made.");
-    await setSubscriptionPolicy(pubsub);
-
     return;
   }
 
@@ -27,8 +24,6 @@ export async function setupPubSubTopicAndSubscription() {
       ttl: null,
     },
   });
-
-  await setSubscriptionPolicy(pubsub);
 
   console.log("✅ Successfully created Pub/Sub topic and subscription.");
   console.log(
