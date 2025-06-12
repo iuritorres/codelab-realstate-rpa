@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { env } from "../env";
 import { getGmailClient } from "../google/gmail/client";
+import { getLastHistoryId } from "../google/gmail/utils/getLastHistoryId";
 import { getNegotiationsLabel } from "../google/gmail/utils/getNegotiationsLabel";
+import { saveLastHistoryId } from "../google/gmail/utils/saveLastHistoryId";
 import { RealStateCategory } from "../notion/enums/notion";
 import { createInvestmentRecord } from "../notion/utils/createInvestmentRecord";
 import { getInvestmentAmountFromPDF } from "../utils/getInvestmentAmountFromPDF";
@@ -32,12 +34,16 @@ webhookRouter.post("/gmail", async (request, response) => {
   const gmail = await getGmailClient();
   const negotiationsLabel = await getNegotiationsLabel({ gmail });
 
+  const lastHistoryId = await getLastHistoryId();
+
   const historyResponse = await gmail.users.history.list({
     userId: "me",
-    startHistoryId: historyId,
+    startHistoryId: lastHistoryId,
     labelId: negotiationsLabel.id!,
     historyTypes: ["messageAdded"],
   });
+
+  await saveLastHistoryId(decodedData.historyId);
 
   const histories = historyResponse.data.history || [];
 

@@ -6,7 +6,7 @@ interface GetLabelsParams {
   gmail: gmail_v1.Gmail;
 }
 
-export async function getNegotiationsLabel({ gmail }: GetLabelsParams) {
+export const getNegotiationsLabel = async ({ gmail }: GetLabelsParams) => {
   const labels = await getLabels({ gmail });
 
   const negotiationsLabel = labels.find(
@@ -18,4 +18,4 @@ export async function getNegotiationsLabel({ gmail }: GetLabelsParams) {
   }
 
   return negotiationsLabel;
-}
+};

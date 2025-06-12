@@ -4,7 +4,7 @@ interface GetLabelsParams {
   gmail: gmail_v1.Gmail;
 }
 
-export async function getLabels({ gmail }: GetLabelsParams) {
+export const getLabels = async ({ gmail }: GetLabelsParams) => {
   const response = await gmail.users.labels.list({
     userId: "me",
   });
@@ -17,4 +17,4 @@ export async function getLabels({ gmail }: GetLabelsParams) {
   }
 
   return labels;
-}
+};
