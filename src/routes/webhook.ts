@@ -43,7 +43,7 @@ webhookRouter.post("/gmail", async (request, response) => {
     historyTypes: ["messageAdded"],
   });
 
-  await saveLastHistoryId(decodedData.historyId);
+  await saveLastHistoryId(historyResponse.data.historyId!);
 
   const histories = historyResponse.data.history || [];
 

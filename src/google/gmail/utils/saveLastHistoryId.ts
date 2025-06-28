@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { cwd } from "process";
 
 export const saveLastHistoryId = async (historyId: string) => {
-  const filePath = path.join(__dirname, "lastHistoryId.txt");
+  const filePath = path.join(cwd(), "lastHistoryId.txt");
 
   try {
     fs.writeFileSync(filePath, historyId, "utf8");
