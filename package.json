@@ -2,11 +2,11 @@
   "name": "codelab-realstate-rpa",
   "description": "A Real State RPA project using Google Cloud Pub/Sub and Notion API",
   "author": {
-    "name": "CodeLab",
+    "name": "codelab",
     "email": "iuri.t1000@gmail.com",
     "url": "https://github.com/iuritorres"
   },
-  "license": "ISC",
+  "license": "MIT",
   "keywords": [
     "google-cloud",
     "notion",
