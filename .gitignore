@@ -1,0 +1,79 @@
+# Terraform files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform lock file (algumas pessoas commitam, outras não)
+# .terraform.lock.hcl
+
+# Backup files
+*.backup
+*.bak
+
+# Credentials and secrets
+**/credentials.json
+**/gcp-credentials.json
+**/gmail-credentials.json
+**/*-credentials.json
+*.pem
+*.key
+*.p12
+**/.env
+**/.env.*
+!**/.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.code-workspace
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+
+# Providers
+.terraform.d/
+
