@@ -1,0 +1,48 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: "google-github-actions/auth@v2"
+        with:
+          workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
+          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
+
+      - name: Docker Auth
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push Container
+        run: |
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/meu-repo/${{ secrets.SERVICE_NAME }}:${{ github.sha }} .
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/meu-repo/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        uses: "google-github-actions/deploy-cloudrun@v2"
+        with:
+          service: "${{ secrets.SERVICE_NAME }}"
+          region: ${{ secrets.GCP_REGION }}
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/meu-repo/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+          flags: |
+            --cpu-boost=false
+            --memory=128Mi
+            --cpu=1
+            --min-instances=0
+            --max-instances=3
+            --service-account=${{ secrets.WIF_SERVICE_ACCOUNT }}
